@@ -1,13 +1,11 @@
-const express = require('express');
-const app = express();
-
+const knex = require('../config/knexfile');
 const tasks = require('../data/task');
+const express = require('express');
 const bodyParser = require('body-parser');
+const route = express.Router();
+route.use(bodyParser.json());
 
-app.use(bodyParser.json());
-
-
-app.get('/tareas', async (req, res) => {
+route.get('/tareas', async (req, res) => {
   try {
     const tasks = await knex.select().from('tareas');
     res.json(tasks);
@@ -16,13 +14,13 @@ app.get('/tareas', async (req, res) => {
   }
 });
 
-app.post('/agregar-tarea', (req, res) => {
+route.post('/agregar-tarea', (req, res) => {
   const newTask = req.body;
   tasks.push(newTask);
   res.status(201).json({ message: 'Tarea agregada correctamente' });
 });
 
-app.put('/actualizar-tarea/:taskId', (req, res) => {
+route.put('/actualizar-tarea/:taskId', (req, res) => {
   const taskId = req.params.taskId;
   const updatedTaskData = req.body;
 
@@ -35,7 +33,4 @@ app.put('/actualizar-tarea/:taskId', (req, res) => {
   }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor en ejecución en el puerto ${PORT}`);
-});
+module.exports = route;
